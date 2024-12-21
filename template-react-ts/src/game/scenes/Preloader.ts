@@ -34,6 +34,7 @@ export class Preloader extends Scene
         this.load.image('background_1', 'background_1.png')
         this.load.image('logo', 'logo.png');
         this.load.image('sal', 'sal_32bit.png');
+        this.load.image('sal_left', 'sal_32bit_left.png');
         this.load.image('figs', 'figs_32bit.png');
     }
 

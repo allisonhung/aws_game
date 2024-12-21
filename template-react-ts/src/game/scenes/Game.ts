@@ -51,8 +51,10 @@ export class Game extends Scene
         if (this.sal && this.cursors) {
             if (this.cursors.left?.isDown) {
                 this.sal.setVelocityX(-160);
+                this.sal.setTexture('sal_left');
             } else if (this.cursors.right?.isDown) {
                 this.sal.setVelocityX(160);
+                this.sal.setTexture('sal');
             } else {
                 this.sal.setVelocityX(0);
             }
