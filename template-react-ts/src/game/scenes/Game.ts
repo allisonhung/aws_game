@@ -44,8 +44,22 @@ export class Game extends Scene
             } else if (this.cursors.down?.isDown) {
                 this.sal.y += 5;
             }
+
+            // When sprite touched any part of the game border, change scene
+            const gameConfig = this.sys.game.config as unknown as Phaser.Types.Core.GameConfig;
+            const gameWidth = Number(gameConfig.width);
+            const gameHeight = Number(gameConfig.height);
+            if (
+                this.sal.x <= 0 ||
+                this.sal.x >= gameWidth ||
+                this.sal.y <= 0 ||
+                this.sal.y >= gameHeight
+            ) {
+                this.changeScene();
+            }
         }
-    }
+        }
+    
     changeScene ()
     {
         this.scene.start('GameOver');
