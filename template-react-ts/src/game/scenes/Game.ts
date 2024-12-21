@@ -1,11 +1,10 @@
 import { EventBus } from '../EventBus';
-import { Scene, GameObjects} from 'phaser';
+import { Scene, GameObjects, Physics} from 'phaser';
 
 export class Game extends Scene
 {
     background: GameObjects.Image;
-    logoTween: Phaser.Tweens.Tween | null;
-    sal: GameObjects.Sprite | null = null;
+    sal: Physics.Arcade.Sprite | null = null;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     
     constructor ()
@@ -22,27 +21,44 @@ export class Game extends Scene
         this.background.displayWidth = gameConfig.width as number;
         this.background.displayHeight = gameConfig.height as number;
 
-        // add sal
-        this.sal = this.add.sprite(400, 300, 'sal');
-        if (this.input.keyboard) {
+        const gameWidth = Number(gameConfig.width);
+        const gameHeight = Number(gameConfig.height);
+        this.physics.world.setBounds(
+            0,               // x
+            0,               // y
+            gameWidth,       // width
+            gameHeight,      // height
+            false,           // checkLeft
+            false,           // checkRight
+            false,           // checkUp
+            true             // checkDown
+          );
+
+
+        // Convert sal to a physics-enabled sprite
+        this.sal = this.physics.add.sprite(400, 300, 'sal');
+        this.sal.setScale(0.25);
+        this.sal.setCollideWorldBounds(true);
+
+        if (this.input.keyboard){
             this.cursors = this.input.keyboard.createCursorKeys();
         }
-        this.sal.setScale(0.25);
+
 
         EventBus.emit('current-scene-ready', this);
     }
     update() {
-        if (this.cursors && this.sal) {
+        if (this.sal && this.cursors) {
             if (this.cursors.left?.isDown) {
-                this.sal.x -= 5;
+                this.sal.setVelocityX(-160);
             } else if (this.cursors.right?.isDown) {
-                this.sal.x += 5;
+                this.sal.setVelocityX(160);
+            } else {
+                this.sal.setVelocityX(0);
             }
 
-            if (this.cursors.up?.isDown) {
-                this.sal.y -= 5;
-            } else if (this.cursors.down?.isDown) {
-                this.sal.y += 5;
+            if (this.cursors.up?.isDown && this.sal.body && this.sal.body.touching.down) {
+                this.sal.setVelocityY(-330);
             }
 
             // When sprite touched any part of the game border, change scene
