@@ -36,6 +36,16 @@ export class Preloader extends Scene
         this.load.image('sal', 'sal_32bit.png');
         this.load.image('sal_left', 'sal_32bit_left.png');
         this.load.image('figs', 'figs_32bit.png');
+        this.load.spritesheet('sal_walk', 'sal_32bit_walk.png', { 
+            frameWidth: 1024, 
+            frameHeight: 1024 });
+        this.load.spritesheet('sal_idle','sal_32bit_idling_v2.png', {
+            frameWidth: 1024,
+            frameHeight: 1024 });
+        this.load.spritesheet('figs_idle', 'figs_32bit_idling.png', {
+            frameWidth: 1024,
+            frameHeight: 1024 });
+        
     }
 
     create ()

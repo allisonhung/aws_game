@@ -1,14 +1,17 @@
 import { GameObjects, Scene } from 'phaser';
 
 import { EventBus } from '../EventBus';
+import { Sal } from '../components/Sal';
+import { Figs } from '../components/Figs';
 
 export class MainMenu extends Scene
 {
     background: GameObjects.Image;
     title: GameObjects.Text;
     logoTween: Phaser.Tweens.Tween | null;
-    sal: GameObjects.Sprite | null = null;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
+    sal: Sal | null = null;
+    figs: Figs | null = null;
 
     constructor ()
     {
@@ -23,7 +26,12 @@ export class MainMenu extends Scene
         this.background.displayWidth = gameConfig.width as number;
         this.background.displayHeight = gameConfig.height as number;
 
+        const gameHeight = Number(gameConfig.height);
 
+        this.sal = new Sal(this, 400, gameHeight - 250, 'sal');
+        this.sal.setScale(0.25);
+        this.figs = new Figs(this, 800, gameHeight - 250, 'figs');
+        this.figs.setScale(0.25);
 
         this.title = this.add.text(512, 460, 'Cat Chase', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
@@ -31,7 +39,6 @@ export class MainMenu extends Scene
             align: 'center'
         }).setOrigin(0.5).setDepth(100);
 
-        this.sal = this.add.sprite(400, 300, 'sal');
         if (this.input.keyboard) {
             this.cursors = this.input.keyboard.createCursorKeys();
         }
@@ -39,19 +46,8 @@ export class MainMenu extends Scene
         EventBus.emit('current-scene-ready', this);
     }
     update() {
-        if (this.cursors && this.sal) {
-            if (this.cursors.left?.isDown) {
-                this.sal.x -= 5;
-            } else if (this.cursors.right?.isDown) {
-                this.sal.x += 5;
-            }
-
-            if (this.cursors.up?.isDown) {
-                this.sal.y -= 5;
-            } else if (this.cursors.down?.isDown) {
-                this.sal.y += 5;
-            }
-        }
+        this.sal?.update();
+        this.figs?.update();
     }
     
     changeScene ()

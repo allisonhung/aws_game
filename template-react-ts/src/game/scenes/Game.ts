@@ -1,13 +1,15 @@
 import { EventBus } from '../EventBus';
-import { Scene, GameObjects, Physics } from 'phaser';
-import { BaseSprite } from '../BaseSprite';
+import { Scene, GameObjects } from 'phaser';
+import { Sal } from '../components/Sal';
 
 export class Game extends Scene {
     background: GameObjects.Image;
-    sal: BaseSprite | null = null;
+    sal: Sal | null = null;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
-
-    constructor() {
+    facingLeft: boolean = false;
+    
+    constructor ()
+    {
         super('Game');
     }
 
@@ -21,6 +23,9 @@ export class Game extends Scene {
 
         const gameWidth = Number(gameConfig.width);
         const gameHeight = Number(gameConfig.height);
+        this.sal = new Sal(this, 400, gameHeight - 250, 'sal_walk');
+        this.sal.setScale(0.25);
+
         this.physics.world.setBounds(
             0,               // x
             0,               // y
@@ -35,10 +40,6 @@ export class Game extends Scene {
          // Create ground
          const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
          this.physics.add.existing(ground, true); // Static body
- 
-         // Create sal as an instance of BaseSprite
-         this.sal = new BaseSprite(this, 400, gameHeight - 250, 'sal');
-         this.sal.setScale(0.25);
  
          // Add collision between sal and ground
          this.physics.add.collider(this.sal, ground);
