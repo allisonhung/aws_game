@@ -7,6 +7,9 @@ export class Game extends Scene {
     sal: Sal | null = null;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     facingLeft: boolean = false;
+    private lives: number = 7;
+    private livesText: Phaser.GameObjects.Text;
+ 
     
     constructor ()
     {
@@ -23,11 +26,21 @@ export class Game extends Scene {
 
         const gameWidth = Number(gameConfig.width);
         const gameHeight = Number(gameConfig.height);
+        
+        // Remove camera zoom or set to 1.0
+        this.cameras.main.setZoom(1.0); // Comment out or remove this line
+
         this.sal = new Sal(this, 400, gameHeight - 250, 'sal_walk');
-        this.sal.setScale(0.25);
+        this.sal.setScale(0.07); // Reduced from 0.05
+
+        if (this.sal) {
+            const body = this.sal.body as Phaser.Physics.Arcade.Body;
+            body.setSize(this.sal.width * 0.6, this.sal.height * 0.7); 
+            body.setOffset(this.sal.width * 0.2, this.sal.height * 0.3);
+        }
 
         const platform = this.physics.add.staticSprite(gameWidth-100,gameHeight-150,'pinkbar');
-        platform.setScale(1.0).refreshBody(); //changes size of plateform
+        platform.setScale(0.4).refreshBody(); // Reduced from 0.7
         if (this.sal) {
             this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
                 const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
@@ -75,13 +88,19 @@ export class Game extends Scene {
          // Add collision between sal and ground
          this.physics.add.collider(this.sal, ground);
  
+         // Add lives display in top left corner
+         this.livesText = this.add.text(16, 16, 'Lives: ' + this.lives, {
+             fontSize: '32px',
+             color: '#000'
+         });
+ 
          EventBus.emit('current-scene-ready', this);
      }
     update() {
         if (this.sal) {
             this.sal.update();
 
-            // When sprite touched any part of the game border, change scene
+            // When sprite touched any part of the game border, decrease lives
             const gameConfig = this.sys.game.config as unknown as Phaser.Types.Core.GameConfig;
             const gameWidth = Number(gameConfig.width);
             const gameHeight = Number(gameConfig.height);
@@ -93,7 +112,7 @@ export class Game extends Scene {
                 this.sal.y - salHeight / 2 <= 0 ||
                 this.sal.y + salHeight / 2 >= gameHeight
             ) {
-                this.changeScene();
+                this.updateLives(-1);
             }
         }
     }
@@ -102,5 +121,14 @@ export class Game extends Scene {
 
     changeScene() {
         this.scene.start('GameOver');
+    }
+
+    // Add method to update lives
+    private updateLives(change: number) {
+        this.lives += change;
+        this.livesText.setText('Lives: ' + this.lives);
+        if (this.lives <= 0) {
+            this.scene.start('GameOver');
+        }
     }
 }
