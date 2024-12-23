@@ -26,7 +26,7 @@ constructor ()
             this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
                 const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
                 const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                return salBody.bottom <= platBody.top + 5;
+                return salBody.bottom <= platBody.top +10;
             });
         }
     }
@@ -111,20 +111,16 @@ constructor ()
     update() {
         if (this.sal) {
             this.sal.update();
+            
 
             // When sprite touched any part of the game border, decrease lives
             const gameConfig = this.sys.game.config as unknown as Phaser.Types.Core.GameConfig;
             const gameWidth = Number(gameConfig.width);
-            const gameHeight = Number(gameConfig.height);
             const salWidth = this.sal.displayWidth;
-            const salHeight = this.sal.displayHeight;
             if (
-                this.sal.x - salWidth / 2 <= 0 ||
-                this.sal.x + salWidth / 2 >= gameWidth ||
-                this.sal.y - salHeight / 2 <= 0 ||
-                this.sal.y + salHeight / 2 >= gameHeight
-            ) {
-                this.updateLives(-1);
+                this.sal.x + salWidth / 2 >= gameWidth 
+            ) {   
+                this.scene.start('Game_2'); // Transition to Game_2
             }
         }
 
@@ -148,16 +144,9 @@ constructor ()
  
 
     changeScene() {
-        this.scene.start('GameOver');
+        this.scene.start('Game_2');
     }
 
-    // Add method to update lives
-    private updateLives(change: number) {
-        this.lives += change;
-        this.livesText.setText('Lives: ' + this.lives);
-        if (this.lives <= 0) {
-            this.scene.start('GameOver');
-        }
-    }
+    
 
 }

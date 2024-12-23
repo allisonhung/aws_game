@@ -55,6 +55,7 @@ export class Preloader extends Scene
 
         this.load.image('pinkbar', 'pink_bar.png');
         this.load.image('vacuum', 'vacuum-1.png');
+        this.load.image('background_2', 'background_v2.png');
     }
 
     create ()
