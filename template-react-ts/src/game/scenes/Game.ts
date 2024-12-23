@@ -1,6 +1,7 @@
 import { EventBus } from '../EventBus';
 import { Scene, GameObjects } from 'phaser';
 import { Sal } from '../components/Sal';
+import { Vacuum } from '../components/Vacuum';
 
 export class Game extends Scene {
     background: GameObjects.Image;
@@ -9,6 +10,8 @@ export class Game extends Scene {
     facingLeft: boolean = false;
     private lives: number = 7;
     private livesText: Phaser.GameObjects.Text;
+    private vacuum: Vacuum;
+    
  
     
     constructor ()
@@ -16,22 +19,38 @@ export class Game extends Scene {
         super('Game');
     }
 
+    private createPlatform(x: number, y: number): void {
+        const platform = this.physics.add.staticSprite(x, y, 'pinkbar');
+        platform.setScale(0.5).refreshBody();
+        
+        if (this.sal) {
+            this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
+                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                return salBody.bottom <= platBody.top + 5;
+            });
+        }
+    }
+
     create() {
-        // set background
         this.background = this.add.image(0, 0, 'background_1').setOrigin(0, 0);
-        // Ensure the background image scales to fit the game dimensions
+        
         const gameConfig = this.sys.game.config as unknown as Phaser.Types.Core.GameConfig;
         this.background.displayWidth = gameConfig.width as number;
         this.background.displayHeight = gameConfig.height as number;
 
         const gameWidth = Number(gameConfig.width);
         const gameHeight = Number(gameConfig.height);
-        
-        // Remove camera zoom or set to 1.0
-        this.cameras.main.setZoom(1.0); // Comment out or remove this line
 
+        // Creating Sal
         this.sal = new Sal(this, 400, gameHeight - 250, 'sal_walk');
-        this.sal.setScale(0.07); // Reduced from 0.05
+        this.sal.setScale(0.07); 
+          // Creating vacuum enemy
+        this.vacuum = new Vacuum(this, 700, gameHeight - 250, 'vacuum');
+        this.vacuum.setScale(2.0);
+        // Create ground
+        const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
+        this.physics.add.existing(ground, true); 
 
         if (this.sal) {
             const body = this.sal.body as Phaser.Physics.Arcade.Body;
@@ -39,61 +58,58 @@ export class Game extends Scene {
             body.setOffset(this.sal.width * 0.2, this.sal.height * 0.3);
         }
 
-        const platform = this.physics.add.staticSprite(gameWidth-100,gameHeight-150,'pinkbar');
-        platform.setScale(0.4).refreshBody(); // Reduced from 0.7
-        if (this.sal) {
-            this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
-                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                return salBody.bottom <= platBody.top + 10;
-            });
-        }
+        // Platform positions
+        const platformPositions = [
+            { x: gameWidth-100, y: gameHeight-150 },
+            { x: gameWidth-300, y: gameHeight-250 },
+            { x: gameWidth-500, y: gameHeight-350 },
+            { x: gameWidth-300, y: gameHeight-450 },
+            { x: gameWidth-400, y: gameHeight-550 },
+            { x: gameWidth-200, y: gameHeight-650 },
+            { x: gameWidth-300, y: gameHeight-750 },
+            { x: gameWidth-800, y: gameHeight-350 }
+        ];
+
+        // Create all platforms
+        platformPositions.forEach(pos => this.createPlatform(pos.x, pos.y));
 
         this.physics.world.setBounds(
             0,               // x
             0,               // y
             gameWidth,       // width
             gameHeight,      // height
-            false,           // checkLeft
-            false,           // checkRight
+            true,           // checkLeft
+            true,           // checkRight
             false,           // checkUp
             true             // checkDown
         );
-
-        const platform2 = this.physics.add.staticSprite(gameWidth-300,gameHeight-250,'pinkbar');
-        platform2.setScale(.5).refreshBody();
-        if (this.sal) {
-            this.physics.add.collider(this.sal, platform2, undefined, (sal, plat) => {
-                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                return salBody.bottom <= platBody.top + 10;
-            });
-        }
-
-        const platform3 = this.physics.add.staticSprite(gameWidth-500,gameHeight-350,'pinkbar');
-        platform3.setScale(.5).refreshBody();
-        if (this.sal) {
-            this.physics.add.collider(this.sal, platform3, undefined, (sal, plat) => {
-                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                return salBody.bottom <= platBody.top + 5;
-            });
-        }
-
-
-         // Create ground
-         const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
-         this.physics.add.existing(ground, true); // Static body
  
          // Add collision between sal and ground
          this.physics.add.collider(this.sal, ground);
+         // vacuum collision
+         this.physics.add.collider(this.vacuum, ground);
  
-         // Add lives display in top left corner
+         // Lives counter
          this.livesText = this.add.text(16, 16, 'Lives: ' + this.lives, {
              fontSize: '32px',
-             color: '#000'
+             color: '#000' //black
          });
- 
+
+         // collision between vacuum and sal, need to add else for =0 lives
+         this.physics.add.overlap(this.sal, this.vacuum, () => {
+            if (this.lives >= 0) {
+                this.lives--;
+                this.livesText.setText('Lives: ' + this.lives);
+                // Reset Sal's position when hit
+                if (this.sal) {
+                    this.sal.setPosition(400, gameHeight - 250);
+                }
+            }
+            if (this.lives <= 0) {
+                this.scene.start('GameOver');
+            }
+        }, undefined, this);
+
          EventBus.emit('current-scene-ready', this);
      }
     update() {
@@ -115,6 +131,11 @@ export class Game extends Scene {
                 this.updateLives(-1);
             }
         }
+
+        if (this.vacuum) {
+            this.vacuum.update();
+            const vacuumBody = this.vacuum.body as Phaser.Physics.Arcade.Body;  
+        }
     }
 
  
@@ -131,4 +152,5 @@ export class Game extends Scene {
             this.scene.start('GameOver');
         }
     }
+
 }

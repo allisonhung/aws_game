@@ -29,7 +29,7 @@ export class Preloader extends Scene
 
     preload ()
     {
-        //  Load the assets for the game - Replace with your own assets
+        //  Game Assets
         this.load.setPath('assets');
         this.load.image('background_1', 'background_1.png')
         this.load.image('logo', 'logo.png');
@@ -50,7 +50,7 @@ export class Preloader extends Scene
             frameHeight: 1024 });
         
         this.load.image('pinkbar', 'pink_bar.png');
-        
+        this.load.image('vacuum', 'assets/vacuum.png');
     }
 
     create ()
