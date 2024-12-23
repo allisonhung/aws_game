@@ -48,9 +48,13 @@ export class Preloader extends Scene
         this.load.spritesheet('figs_walk', 'figs_32bit_walking.png', {
             frameWidth: 1024,
             frameHeight: 1024 });
+        this.load.spritesheet('sal_jump', 'sal_32bit_jumping_v4.png', {
+            frameWidth: 1024,
+            frameHeight: 704 });
         
+
         this.load.image('pinkbar', 'pink_bar.png');
-        //this.load.image('vacuum', 'vacuum.png');
+        this.load.image('vacuum', 'vacuum-1.png');
     }
 
     create ()

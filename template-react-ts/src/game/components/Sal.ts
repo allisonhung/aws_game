@@ -34,36 +34,52 @@ export class Sal extends Physics.Arcade.Sprite {
             frameRate: 2,
             repeat: -1
         });
+        scene.anims.create({
+            key: 'sal_jump_anim',
+            frames: scene.anims.generateFrameNumbers('sal_jump', { start: 0, end: 3 }),
+            frameRate: 3,
+            repeat: 0
+        })
     }
 
     update() {
-        if (!this.cursors) return; // If no keyboard, do nothing
+        if (!this.cursors) return;
 
-        // Left movement
+        // 1. Horizontal movement (works even in midair)
         if (this.cursors.left?.isDown) {
             this.setVelocityX(-160);
             this.flipX = true;
-            this.anims.play('sal_walk_anim', true);
             this.facingLeft = true;
-
-        // Right movement
         } else if (this.cursors.right?.isDown) {
             this.setVelocityX(160);
             this.flipX = false;
-            this.anims.play('sal_walk_anim', true);
             this.facingLeft = false;
-
-        // Idle
         } else {
             this.setVelocityX(0);
-            this.anims.play('sal_idle_anim', true);
-            // Flip the idle animation if facing left
-            this.flipX = this.facingLeft;
         }
 
-        // Jump (space bar)
-        if (this.cursors.space?.isDown && this.body?.touching.down) {
-            this.setVelocityY(-500);
+        // 2. Jump if on ground
+        const onGround = this.body?.touching.down || this.body?.blocked.down; 
+        if ((this.cursors.space?.isDown || this.cursors.up?.isDown) && onGround) {
+            this.setVelocityY(-600);
+            this.anims.play('sal_jump_anim');
         }
+
+        // 3. Animate based on whether Sal is in midair
+        if (!onGround) {
+            // If Sal is off the ground, ensure jump animation is playing
+            if (this.anims.currentAnim?.key !== 'sal_jump_anim') {
+                this.anims.play('sal_jump_anim');
+            }
+        } else {
+            // On ground, if moving horizontally, walk; otherwise idle
+            if (this.body?.velocity.x !== 0) {
+                this.anims.play('sal_walk_anim', true);
+            } else {
+                this.anims.play('sal_idle_anim', true);
+                this.flipX = this.facingLeft;
+            }
+        }
+        
     }
 }

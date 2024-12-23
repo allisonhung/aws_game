@@ -10,8 +10,8 @@ export class Game extends Scene {
     facingLeft: boolean = false;
     private lives: number = 7;
     private livesText: Phaser.GameObjects.Text;
-vacuum: Vacuum | null = null;
-private vacuumDirection: number = 1;
+    vacuum: Vacuum | null = null;
+    private vacuumDirection: number = 1;
 
 constructor ()
     {
@@ -44,19 +44,15 @@ constructor ()
 
         // Creating Sal
         this.sal = new Sal(this, 400, gameHeight - 250, 'sal_walk');
-        this.sal.setScale(0.07); 
+        this.sal.setScale(0.1); 
+
           // Creating vacuum enemy
         this.vacuum = new Vacuum(this, 700, gameHeight - 250, 'vacuum');
-        this.vacuum.setScale(1.0);
+        this.vacuum.setScale(0.1);
         // Create ground
         const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
         this.physics.add.existing(ground, true); 
 
-        if (this.sal) {
-            const body = this.sal.body as Phaser.Physics.Arcade.Body;
-            body.setSize(this.sal.width * 0.6, this.sal.height * 0.7); 
-            body.setOffset(this.sal.width * 0.2, this.sal.height * 0.3);
-        }
 
         // Platform positions
         const platformPositions = [
