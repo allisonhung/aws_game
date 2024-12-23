@@ -26,6 +26,13 @@ export class Game extends Scene {
         this.sal = new Sal(this, 400, gameHeight - 250, 'sal_walk');
         this.sal.setScale(0.25);
 
+        const platform = this.physics.add.staticSprite(gameWidth-100,gameHeight-150,'pinkbar');
+        platform.setScale(.5).refreshBody();
+        // Add collider between Sal and the platform
+        if (this.sal) {
+            this.physics.add.collider(this.sal, platform);
+        }
+
         this.physics.world.setBounds(
             0,               // x
             0,               // y
