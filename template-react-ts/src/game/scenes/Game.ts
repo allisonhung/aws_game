@@ -27,10 +27,13 @@ export class Game extends Scene {
         this.sal.setScale(0.25);
 
         const platform = this.physics.add.staticSprite(gameWidth-100,gameHeight-150,'pinkbar');
-        platform.setScale(.5).refreshBody();
-        // Add collider between Sal and the platform
+        platform.setScale(1.0).refreshBody(); //changes size of plateform
         if (this.sal) {
-            this.physics.add.collider(this.sal, platform);
+            this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
+                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                return salBody.bottom <= platBody.top + 10;
+            });
         }
 
         this.physics.world.setBounds(
@@ -43,6 +46,27 @@ export class Game extends Scene {
             false,           // checkUp
             true             // checkDown
         );
+
+        const platform2 = this.physics.add.staticSprite(gameWidth-300,gameHeight-250,'pinkbar');
+        platform2.setScale(.5).refreshBody();
+        if (this.sal) {
+            this.physics.add.collider(this.sal, platform2, undefined, (sal, plat) => {
+                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                return salBody.bottom <= platBody.top + 10;
+            });
+        }
+
+        const platform3 = this.physics.add.staticSprite(gameWidth-500,gameHeight-350,'pinkbar');
+        platform3.setScale(.5).refreshBody();
+        if (this.sal) {
+            this.physics.add.collider(this.sal, platform3, undefined, (sal, plat) => {
+                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                return salBody.bottom <= platBody.top + 5;
+            });
+        }
+
 
          // Create ground
          const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
