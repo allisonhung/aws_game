@@ -10,11 +10,10 @@ export class Game extends Scene {
     facingLeft: boolean = false;
     private lives: number = 7;
     private livesText: Phaser.GameObjects.Text;
-    private vacuum: Vacuum;
-    
- 
-    
-    constructor ()
+vacuum: Vacuum | null = null;
+private vacuumDirection: number = 1;
+
+constructor ()
     {
         super('Game');
     }
@@ -33,6 +32,7 @@ export class Game extends Scene {
     }
 
     create() {
+        // set background
         this.background = this.add.image(0, 0, 'background_1').setOrigin(0, 0);
         
         const gameConfig = this.sys.game.config as unknown as Phaser.Types.Core.GameConfig;
@@ -47,7 +47,7 @@ export class Game extends Scene {
         this.sal.setScale(0.07); 
           // Creating vacuum enemy
         this.vacuum = new Vacuum(this, 700, gameHeight - 250, 'vacuum');
-        this.vacuum.setScale(2.0);
+        this.vacuum.setScale(1.0);
         // Create ground
         const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
         this.physics.add.existing(ground, true); 
@@ -134,7 +134,18 @@ export class Game extends Scene {
 
         if (this.vacuum) {
             this.vacuum.update();
-            const vacuumBody = this.vacuum.body as Phaser.Physics.Arcade.Body;  
+            const vacuumBody = this.vacuum.body as Phaser.Physics.Arcade.Body;
+            
+            // Check if vacuum hits world bounds
+            if (vacuumBody.blocked.left) {
+                this.vacuumDirection = 1;
+            } else if (vacuumBody.blocked.right) {
+                this.vacuumDirection = -1;
+            }
+            
+            // Use vacuumDirection to set velocity
+            vacuumBody.setVelocityX(200 * this.vacuumDirection);
+            this.vacuum.setFlipX(this.vacuumDirection > 0);
         }
     }
 

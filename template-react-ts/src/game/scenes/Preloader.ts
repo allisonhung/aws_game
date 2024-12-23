@@ -50,7 +50,7 @@ export class Preloader extends Scene
             frameHeight: 1024 });
         
         this.load.image('pinkbar', 'pink_bar.png');
-        this.load.image('vacuum', 'assets/vacuum.png');
+        //this.load.image('vacuum', 'vacuum.png');
     }
 
     create ()

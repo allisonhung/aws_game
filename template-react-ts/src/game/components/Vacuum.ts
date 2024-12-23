@@ -12,7 +12,7 @@ export class Vacuum extends Physics.Arcade.Sprite {
         // Set up physics body
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setCollideWorldBounds(true);
-        this.setScale(0.07);
+        this.setScale(1.0);
     }
 
     update() {
