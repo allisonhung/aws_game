@@ -32,7 +32,7 @@ export class Game_3 extends Scene {
 
         // Add space key listener
         if (this.input.keyboard){
-            this.input.keyboard.on('keydown-SPACE', this.nextDialogue, this);
+            this.input.keyboard.on('keydown-UP', this.nextDialogue, this);
         }
     }
 
@@ -45,5 +45,4 @@ export class Game_3 extends Scene {
             this.scene.start('MainMenu'); // Example: Restart the game
         }
     } 
-    
 }

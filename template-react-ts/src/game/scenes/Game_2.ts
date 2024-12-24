@@ -8,28 +8,32 @@ export class Game_2 extends Scene {
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     facingLeft: boolean = false;
     private lives: number = 7;
-    private livesText: Phaser.GameObjects.Text;
+    private livesText: GameObjects.Text;
     cameraStartedFollowing: boolean = false;
 
-constructor ()
-    {
-        super('Game_2');
+    constructor () {
+            super('Game_2');
+        }
+
+    init(data: { lives: number }) {
+        this.lives = data.lives;
     }
 
     private createPlatform(x: number, y: number): void {
-            const platform = this.physics.add.staticSprite(x, y, 'greenbar');
-            platform.setScale(0.5).refreshBody();
-            if (this.sal) {
-                this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
-                    const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                    const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
-                    return salBody.bottom <= platBody.top +10;
-                });
-            }
+        const platform = this.physics.add.staticSprite(x, y, 'greenbar');
+        platform.setScale(0.5).refreshBody();
+        if (this.sal) {
+            this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
+                const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                return salBody.bottom <= platBody.top +10;
+            });
+        }
     }
+
     private createBird(x: number, y: number): void {
         const pigeon = this.physics.add.staticSprite(x, y, 'pigeon');
-        pigeon.setScale(5.0, 2.5).refreshBody();
+        pigeon.setScale(.1).refreshBody();
     }
 
     create() {
@@ -38,10 +42,10 @@ constructor ()
         const gameWidth = Number(gameConfig.width);
         const gameHeight = Number(gameConfig.height);
 
-         // Position the background image so that the bottom half is initially visible
-         this.background = this.add.image(0, -gameHeight, 'background_2').setOrigin(0, 0);
-         this.background.setDisplaySize(gameWidth, gameHeight * 2); // Cover the entire game height
- 
+        // Position the background image so that the bottom half is initially visible
+        this.background = this.add.image(0, -gameHeight, 'background_2').setOrigin(0, 0);
+        this.background.setDisplaySize(gameWidth, gameHeight * 2); // Cover the entire game height
+
         // Create Sal at the same ground level as the previous scene
         this.sal = new Sal(this, 10, gameHeight - 250, 'sal_walk');
         this.sal.setScale(0.1);
@@ -63,13 +67,12 @@ constructor ()
         ];
     
         const birdPositions = [
-            { x: gameWidth-750, y: gameHeight-1345 },
+            { x: gameWidth-750, y: gameHeight-1380 },
         ];
 
         // Create all platforms
         platformPositions.forEach(pos => this.createPlatform(pos.x, pos.y));
         birdPositions.forEach(pos => this.createBird(pos.x, pos.y));
-
        
         this.physics.world.setBounds(
             0,               // x
@@ -82,17 +85,17 @@ constructor ()
             true             // checkDown
         );
  
-         // Add collision between sal and ground
-         this.physics.add.collider(this.sal, ground);
- 
-         // Lives counter
-         this.livesText = this.add.text(16, 16, 'Lives: ' + this.lives, {
-             fontSize: '32px',
-             color: '#000' //black
-         });
+        // Add collision between sal and ground
+        this.physics.add.collider(this.sal, ground);
 
-         // invisible window trigger zone location where the pigeon is
-         const windowZone = this.add.rectangle(
+        // Lives counter
+        this.livesText = this.add.text(16, 50, 'Lives: ' + this.lives, {
+            fontSize: '32px',
+            color: '#000' // black
+        }).setScrollFactor(0);
+
+        // invisible window trigger zone location where the pigeon is
+        const windowZone = this.add.rectangle(
             gameWidth-750,          // x position (same as pigeon)
             gameHeight-1345,        // y position (same as pigeon)
             50,                    // width of trigger zone
@@ -107,8 +110,8 @@ constructor ()
             this.scene.start('Game_3');  // Change to next level
         }, undefined, this);
 
-         EventBus.emit('current-scene-ready', this);
-     }
+        EventBus.emit('current-scene-ready', this);
+    }
     update() {
         if (this.sal) {
             this.sal.update();
@@ -123,16 +126,10 @@ constructor ()
             
             
         }
-
+        this.livesText.setText('Lives: ' + this.lives);
         
     }
-
- 
-
     changeScene() {
-        this.scene.start('Game_3');
+        this.scene.start('Game_3', { lives: this.lives });
     }
-
-
-
 }

@@ -31,8 +31,11 @@ export class Preloader extends Scene
     {
         //  Game Assets
         this.load.setPath('assets');
+
+        //load background
         this.load.image('background_1', 'background_1.png')
-        this.load.image('logo', 'logo.png');
+
+        //load sprites
         this.load.image('sal', 'sal_32bit_v3.png');
         this.load.image('sal_left', 'sal_32bit_left_v3.png');
         this.load.image('figs', 'figs_32bit.png');
@@ -52,7 +55,7 @@ export class Preloader extends Scene
             frameWidth: 1024,
             frameHeight: 704 });
         
-
+        //load objects
         this.load.image('pinkbar', 'pink_bar.png');
         this.load.image('vacuum', 'vacuum-1.png');
         this.load.image('background_2', 'background_v2.png');

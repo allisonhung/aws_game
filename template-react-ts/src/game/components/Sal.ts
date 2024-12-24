@@ -3,6 +3,7 @@ import { Physics } from 'phaser';
 export class Sal extends Physics.Arcade.Sprite {
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     facingLeft: boolean = false;
+    private invincible: boolean = false;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
         super(scene, x, y, texture);
@@ -40,6 +41,30 @@ export class Sal extends Physics.Arcade.Sprite {
             frameRate: 3,
             repeat: 0
         })
+    }
+
+    startBlinking(duration: number = 3000) {
+        if (this.invincible) return;
+
+        this.invincible = true;
+
+        // Blinking effect
+        this.scene.time.addEvent({
+            delay: 100,
+            callback: () => {
+                this.setVisible(!this.visible);
+            },
+            repeat: duration / 100 - 1 // Calculate the number of repeats
+        });
+
+        // Reset invincibility after the duration
+        this.scene.time.delayedCall(duration, () => {
+            this.invincible = false;
+            this.setVisible(true); // Ensure Sal is visible after blinking
+        });
+    }
+    isInvincible(): boolean {
+        return this.invincible;
     }
 
     update() {
