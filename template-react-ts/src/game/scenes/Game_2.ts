@@ -16,6 +16,19 @@ constructor ()
         super('Game_2');
     }
 
+    private createPlatform(x: number, y: number): void {
+            const platform = this.physics.add.staticSprite(x, y, 'greenbar');
+            platform.setScale(0.5).refreshBody();
+            
+            if (this.sal) {
+                this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
+                    const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                    const platBody = (plat as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
+                    return salBody.bottom <= platBody.top +10;
+                });
+            }
+        }
+
     create() {
         // set background
         const gameConfig = this.sys.game.config as unknown as Phaser.Types.Core.GameConfig;
@@ -27,12 +40,28 @@ constructor ()
          this.background.setDisplaySize(gameWidth, gameHeight * 2); // Cover the entire game height
  
         // Create Sal at the same ground level as the previous scene
-        this.sal = new Sal(this, 400, gameHeight - 250, 'sal_walk');
+        this.sal = new Sal(this, 10, gameHeight - 250, 'sal_walk');
         this.sal.setScale(0.1);
 
         // Create ground
         const ground = this.add.rectangle(0, gameHeight - 50, gameWidth, 50).setOrigin(0, 0);
         this.physics.add.existing(ground, true);
+
+        // Platform positions
+        const platformPositions = [
+            { x: gameWidth-650, y: gameHeight-200 },
+            { x: gameWidth-400, y: gameHeight-350 },
+            { x: gameWidth-650, y: gameHeight-500 },
+            { x: gameWidth-400, y: gameHeight-650 },
+            { x: gameWidth-650, y: gameHeight-800 },
+            { x: gameWidth-400, y: gameHeight-950 },
+            { x: gameWidth-650, y: gameHeight-1100 },
+            { x: gameWidth-400, y: gameHeight-1250 }
+        ];
+
+
+        // Create all platforms
+        platformPositions.forEach(pos => this.createPlatform(pos.x, pos.y));
 
        
         this.physics.world.setBounds(
@@ -71,6 +100,7 @@ constructor ()
                 this.cameraStartedFollowing = true;
             }
             
+            
         }
 
         
@@ -79,7 +109,7 @@ constructor ()
  
 
     changeScene() {
-        this.scene.start('Game_2');
+        this.scene.start('Game_3');
     }
 
 
