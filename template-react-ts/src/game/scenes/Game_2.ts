@@ -19,7 +19,6 @@ constructor ()
     private createPlatform(x: number, y: number): void {
             const platform = this.physics.add.staticSprite(x, y, 'greenbar');
             platform.setScale(0.5).refreshBody();
-            
             if (this.sal) {
                 this.physics.add.collider(this.sal, platform, undefined, (sal, plat) => {
                     const salBody = (sal as Phaser.GameObjects.GameObject).body as Phaser.Physics.Arcade.Body;
@@ -27,7 +26,11 @@ constructor ()
                     return salBody.bottom <= platBody.top +10;
                 });
             }
-        }
+    }
+    private createBird(x: number, y: number): void {
+        const pigeon = this.physics.add.staticSprite(x, y, 'pigeon');
+        pigeon.setScale(5.0, 2.5).refreshBody();
+    }
 
     create() {
         // set background
@@ -58,10 +61,14 @@ constructor ()
             { x: gameWidth-650, y: gameHeight-1100 },
             { x: gameWidth-400, y: gameHeight-1250 }
         ];
-
+    
+        const birdPositions = [
+            { x: gameWidth-750, y: gameHeight-1345 },
+        ];
 
         // Create all platforms
         platformPositions.forEach(pos => this.createPlatform(pos.x, pos.y));
+        birdPositions.forEach(pos => this.createBird(pos.x, pos.y));
 
        
         this.physics.world.setBounds(
@@ -84,7 +91,21 @@ constructor ()
              color: '#000' //black
          });
 
-         
+         // invisible window trigger zone location where the pigeon is
+         const windowZone = this.add.rectangle(
+            gameWidth-750,          // x position (same as pigeon)
+            gameHeight-1345,        // y position (same as pigeon)
+            50,                    // width of trigger zone
+            50,                    // height of trigger zone
+            0x000000,              // color (invisible)
+            0                      // alpha (transparent)
+        );
+        this.physics.add.existing(windowZone, true);
+
+        // Add collision between Sal and window zone
+        this.physics.add.overlap(this.sal, windowZone, () => {
+            this.scene.start('Game_3');  // Change to next level
+        }, undefined, this);
 
          EventBus.emit('current-scene-ready', this);
      }
