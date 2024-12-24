@@ -41,4 +41,7 @@ export class Game_3 extends Scene {
             this.scene.start('MainMenu'); // Example: Restart the game
         });
     }
+    changeScene() {
+        this.scene.start('MainMenu');
+    }
 }

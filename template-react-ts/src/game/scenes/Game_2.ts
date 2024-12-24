@@ -19,6 +19,7 @@ export class Game_2 extends Scene {
 
     init(data: { lives: number }) {
         this.lives = data.lives;
+        this.cameraStartedFollowing = false;
     }
 
     private createPlatform(x: number, y: number): void {
@@ -104,7 +105,7 @@ export class Game_2 extends Scene {
 
         // Add collision between Sal and window zone
         this.physics.add.overlap(this.sal, windowZone, () => {
-            this.scene.start('Game_3');  // Change to next level
+            this.scene.start('Game_4', {lives: this.lives});  // Change to next level
         }, undefined, this);
 
         EventBus.emit('current-scene-ready', this);
@@ -127,6 +128,6 @@ export class Game_2 extends Scene {
         
     }
     changeScene() {
-        this.scene.start('Game_3', { lives: this.lives });
+        this.scene.start('Game_4', { lives: this.lives });
     }
 }
