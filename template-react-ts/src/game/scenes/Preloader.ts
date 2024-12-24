@@ -39,6 +39,7 @@ export class Preloader extends Scene
         this.load.image('sal', 'sal_32bit_v3.png');
         this.load.image('sal_left', 'sal_32bit_left_v3.png');
         this.load.image('figs', 'figs_32bit.png');
+        this.load.image('sal_dad', 'sal_dad.png');
         this.load.spritesheet('sal_walk', 'sal_32bit_walk_v3.png', { 
             frameWidth: 1024, 
             frameHeight: 704 });
@@ -62,6 +63,7 @@ export class Preloader extends Scene
         this.load.image('greenbar', 'green_bar.png');
         this.load.image('graybar', 'ledge_grey.png');
         this.load.image('pigeon', 'pigeon.png');
+        this.load.image('dialogueBox', 'dialogue_v2.png');
     }
 
     create ()
